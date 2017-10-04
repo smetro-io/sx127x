@@ -1,0 +1,20 @@
+author: smetro-io
+type: lib
+description: Semtech SX1272 and SX1276 radios driver
+version: 1.0
+
+sources:
+  - src
+  - src/sx127x
+includes:
+  - include
+config_schema:
+libs:
+  - origin: https://github.com/mongoose-os-libs/spi
+tags:
+  - c
+  - sx127x
+  - radio
+  - hw
+
+manifest_version: 2017-06-16
