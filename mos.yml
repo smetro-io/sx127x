@@ -9,6 +9,13 @@ sources:
 includes:
   - include
 config_schema:
+  - ["sx127x", "o", {title: "SX127X settings"}]
+  - ["sx127x.rst", "i", 16, {title: "GPIO to use for Reset"}]
+  - ["sx127x.dio0", "i", 27, {title: "GPIO to use for DIO0"}]
+  - ["sx127x.dio1", "i", 26, {title: "GPIO to use for DIO1"}]
+  - ["sx127x.dio2", "i", 22, {title: "GPIO to use for DIO2"}]
+  - ["sx127x.dio3", "i", 17, {title: "GPIO to use for DIO3"}]
+
 libs:
   - origin: https://github.com/mongoose-os-libs/spi
 tags:

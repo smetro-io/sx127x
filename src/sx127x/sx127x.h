@@ -17,8 +17,8 @@ extern "C" {
  * SX127X device default configuration
  */
 #define SX127X_MODEM_DEFAULT             (SX127X_MODEM_LORA)    /**< Use LoRa as default modem */
-#define SX127X_CHANNEL_DEFAULT           (868300000UL)          /**< Default channel frequency, 868.3MHz (Europe) */
-#define SX127X_HF_CHANNEL_DEFAULT        (868000000UL)          /**< Use to calibrate RX chain for LF and HF bands */
+#define SX127X_CHANNEL_DEFAULT           (915000000UL)          /**< Default channel frequency, 915MHz (North America) */
+#define SX127X_HF_CHANNEL_DEFAULT        (915000000UL)          /**< Use to calibrate RX chain for LF and HF bands */
 #define SX127X_RF_MID_BAND_THRESH        (525000000UL)          /**< Mid-band threshold */
 #define SX127X_FREQUENCY_RESOLUTION      (61.03515625)          /**< Frequency resolution in Hz */
 #define SX127X_XTAL_FREQ                 (32000000UL)           /**< Internal oscillator frequency, 32MHz */
@@ -200,6 +200,11 @@ typedef struct {
 typedef uint8_t sx127x_flags_t;
 
 /**
+ * SX127X events callback.
+ */
+typedef void (*sx127x_event_callback)(void *param, int event);
+
+/**
  * SX127X device descriptor.
  */
 typedef struct {
@@ -207,7 +212,15 @@ typedef struct {
     sx127x_params_t params;            /**< Device driver parameters */
     sx127x_internal_t _internal;       /**< Internal sx127x data used within the driver */
     sx127x_flags_t irq;                /**< Device IRQ flags */
+    sx127x_event_callback event_callback; /**< Events callback */
 } sx127x_t;
+
+/**
+ * Resets the SX127X
+ *
+ * @param[in] dev                      The sx127x device descriptor
+ */
+void sx127x_reset(const sx127x_t *dev);
 
 /**
  * Initializes the transceiver.
@@ -217,6 +230,34 @@ typedef struct {
  * @return result of initialization
  */
 int sx127x_init(sx127x_t *dev);
+
+/**
+ * Initialize radio settings with default values
+ *
+ * @param[in] dev                      The sx127x device pointer
+ */
+void sx127x_init_radio_settings(sx127x_t *dev);
+
+/**
+ * Generates 32 bits random value based on the RSSI readings
+ *
+ * This function sets the radio in LoRa mode and disables all
+ * interrupts from it. After calling this function either
+ * sx127x_set_rx_config or sx127x_set_tx_config functions must
+ * be called.
+ *
+ * @param[in] dev                      The sx127x device structure pointer
+ *
+ * @return random 32 bits value
+ */
+uint32_t sx127x_random(sx127x_t *dev);
+
+/**
+ * Start a channel activity detection.
+ *
+ * @param[in] dev                      The sx127x device descriptor
+ */
+void sx127x_start_cad(sx127x_t *dev);
 
 /**
  * Gets current state of transceiver.

@@ -8,6 +8,8 @@
 #include <stdarg.h>
 
 #include "mgos_timers.h"
+#include "mgos_gpio.h"
+#include "mgos_gpio.h"
 #include "mgos_hal.h"
 #include "mgos_spi.h"
 
@@ -19,29 +21,41 @@
 void sx127x_log(sx127x_log_t type, const char *fmt, ...)
 {
 	va_list args;
+    char dest[1024];
 	va_start(args, fmt);
+    vsprintf(dest, fmt, args);
+    va_end(args);
 	switch (type) {
 	case SX127X_ERROR:
-		LOG(LL_ERROR, (fmt, args));
+		LOG(LL_ERROR, (dest));
 		break;
 	case SX127X_INFO:
-		LOG(LL_INFO, (fmt, args));
+		LOG(LL_INFO, (dest));
 		break;
 	case SX127X_DEBUG:
-		LOG(LL_DEBUG, (fmt, args));
+		LOG(LL_DEBUG, (dest));
 		break;
 	}
-	va_end(args);
 }
 
 void sx127x_timer_set(sx127x_timer_t* timer, int timeout, void *cb_arg)
 {
-	timer->id = mgos_set_timer(timeout, false, timer->cb, cb_arg);
+	timer->id = mgos_set_timer(timeout, false, timer->callback, cb_arg);
 }
 
 void sx127x_timer_disable(sx127x_timer_t* timer)
 {
 	mgos_clear_timer(timer->id);
+}
+
+void sx127x_timer_usleep(uint32_t usecs)
+{
+    mgos_usleep(usecs);
+}
+
+void sx127x_timer_msleep(uint32_t msecs)
+{
+    mgos_msleep(msecs);
 }
 
 void sx127x_spi_write(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size)
@@ -86,6 +100,41 @@ void sx127x_spi_read(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size)
     txn.hd.rx_len = size;
     txn.hd.rx_data = buffer;
     mgos_ints_disable();
-    mgos_spi_run_txn((struct mgos_spi *)spi, false /* full_duplex */, &txn);
+    if (!mgos_spi_run_txn((struct mgos_spi *)spi, false /* full_duplex */, &txn)) {
+        sx127x_log(SX127X_ERROR, "Error during spi transfer\n");
+    }
     mgos_ints_enable();
+}
+
+bool sx127x_gpio_init(int pin, sx127x_gpio_mode_t mode)
+{
+    switch (mode) {
+    case GPIO_IN:
+        if (!mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_INPUT)) return false;
+        break;
+    case GPIO_OUT:
+        if (!mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT)) return false;
+        break;
+    }
+    return mgos_gpio_set_pull(pin, MGOS_GPIO_PULL_NONE);
+}
+
+bool sx127x_gpio_init_int(int pin, sx127x_gpio_mode_t mode,
+    sx127x_gpio_int_mode_t int_mode, sx127x_gpio_handler cb, void *arg)
+{
+    if (!sx127x_gpio_init(pin, mode)) return false;
+    switch(int_mode) {
+    case GPIO_RISING:
+        if (!mgos_gpio_set_int_handler(pin, MGOS_GPIO_INT_EDGE_POS, cb, arg)) {
+            return false;
+        }
+        if (!mgos_gpio_enable_int(pin)) return false;
+        break;
+    }
+    return true;
+}
+
+void sx127x_gpio_clear(int pin)
+{
+    mgos_gpio_write(pin, 0);
 }
