@@ -29,6 +29,9 @@ void sx127x_log(sx127x_log_t type, const char *fmt, ...)
 	case SX127X_ERROR:
 		LOG(LL_ERROR, (dest));
 		break;
+    case SX127X_WARNING:
+        LOG(LL_WARN, (dest));
+        break;
 	case SX127X_INFO:
 		LOG(LL_INFO, (dest));
 		break;
@@ -40,7 +43,7 @@ void sx127x_log(sx127x_log_t type, const char *fmt, ...)
 
 void sx127x_timer_set(sx127x_timer_t* timer, int timeout, void *cb_arg)
 {
-	timer->id = mgos_set_timer(timeout, false, timer->callback, cb_arg);
+	timer->id = mgos_set_timer(timeout / 1000, false, timer->callback, cb_arg);
 }
 
 void sx127x_timer_disable(sx127x_timer_t* timer)
@@ -106,7 +109,7 @@ void sx127x_spi_read(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size)
     mgos_ints_enable();
 }
 
-bool sx127x_gpio_init(int pin, sx127x_gpio_mode_t mode)
+bool sx127x_gpio_init(int pin, sx127x_gpio_mode_t mode, sx127x_gpio_pull_t pull)
 {
     switch (mode) {
     case GPIO_IN:
@@ -116,13 +119,26 @@ bool sx127x_gpio_init(int pin, sx127x_gpio_mode_t mode)
         if (!mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT)) return false;
         break;
     }
-    return mgos_gpio_set_pull(pin, MGOS_GPIO_PULL_NONE);
+
+    switch (pull) {
+    case GPIO_PULL_NONE:
+        if (!mgos_gpio_set_pull(pin, MGOS_GPIO_PULL_NONE)) return false;
+        break;
+    case GPIO_PULL_UP:
+        if (!mgos_gpio_set_pull(pin, MGOS_GPIO_PULL_UP)) return false;
+        break;
+    case GPIO_PULL_DOWN:
+        if (!mgos_gpio_set_pull(pin, MGOS_GPIO_PULL_DOWN)) return false;
+        break;
+    }
+    return true;
 }
 
 bool sx127x_gpio_init_int(int pin, sx127x_gpio_mode_t mode,
-    sx127x_gpio_int_mode_t int_mode, sx127x_gpio_handler cb, void *arg)
+    sx127x_gpio_pull_t pull, sx127x_gpio_int_mode_t int_mode,
+    sx127x_gpio_handler cb, void *arg)
 {
-    if (!sx127x_gpio_init(pin, mode)) return false;
+    if (!sx127x_gpio_init(pin, mode, pull)) return false;
     switch(int_mode) {
     case GPIO_RISING:
         if (!mgos_gpio_set_int_handler(pin, MGOS_GPIO_INT_EDGE_POS, cb, arg)) {

@@ -4,8 +4,8 @@ description: Semtech SX1272 and SX1276 radios driver
 version: 1.0
 
 sources:
+  - mgos
   - src
-  - src/sx127x
 includes:
   - include
 config_schema:

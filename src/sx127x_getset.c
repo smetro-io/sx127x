@@ -201,7 +201,7 @@ void sx127x_set_rx(sx127x_t *dev)
             sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ2,
                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ2_ON : SX127X_RF_LORA_INVERTIQ2_OFF));
 
-#if defined(MODULE_SX1276)
+#if !defined(MODULE_SX1272)
             /* ERRATA 2.3 - Receiver Spurious Reception of a LoRa Signal */
             if (dev->settings.lora.bandwidth < 9) {
                 sx127x_reg_write(dev, SX127X_REG_LR_DETECTOPTIMIZE,
@@ -707,7 +707,7 @@ void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
     pa_config = ((pa_config & SX127X_RF_PACONFIG_PASELECT_MASK) |
                  sx127x_get_pa_select(dev->settings.channel));
 
-#if defined(MODULE_SX1276)
+#if !defined(MODULE_SX1272)
     /* max power is 14dBm */
     pa_config = (pa_config & SX127X_RF_PACONFIG_MAX_POWER_MASK) | 0x70;
 #endif

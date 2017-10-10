@@ -26,7 +26,7 @@ void sx127x_reset(const sx127x_t *dev)
      * 2. Set NReset in Hi-Z state
      * 3. Wait at least 5 milliseconds
      */
-    sx127x_gpio_init(dev->params.reset_pin, GPIO_OUT);
+    sx127x_gpio_init(dev->params.reset_pin, GPIO_OUT, GPIO_PULL_NONE);
 
     /* Set reset pin to 0 */
     sx127x_gpio_clear(dev->params.reset_pin);
@@ -35,7 +35,7 @@ void sx127x_reset(const sx127x_t *dev)
     sx127x_timer_msleep(1);
 
     /* Put reset pin in High-Z */
-    sx127x_gpio_init(dev->params.reset_pin, GPIO_IN);
+    sx127x_gpio_init(dev->params.reset_pin, GPIO_IN, GPIO_PULL_NONE);
 
     /* Wait 10 ms */
     sx127x_timer_msleep(10);
@@ -267,23 +267,23 @@ static void sx127x_on_dio3(int pin, void *arg)
 
 static void _init_isrs(sx127x_t *dev)
 {
-    if (sx127x_gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_RISING,
-        sx127x_on_dio0, dev) < 0) {
+    if (!sx127x_gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_PULL_UP,
+        GPIO_RISING, sx127x_on_dio0, dev)) {
         sx127x_log(SX127X_ERROR, "Error: cannot initialize DIO0 pin\n");
     }
 
-    if (sx127x_gpio_init_int(dev->params.dio1_pin, GPIO_IN, GPIO_RISING,
-        sx127x_on_dio1, dev) < 0) {
+    if (!sx127x_gpio_init_int(dev->params.dio1_pin, GPIO_IN, GPIO_PULL_UP,
+        GPIO_RISING, sx127x_on_dio1, dev)) {
         sx127x_log(SX127X_ERROR, "Error: cannot initialize DIO1 pin\n");
     }
 
-    if (sx127x_gpio_init_int(dev->params.dio2_pin, GPIO_IN, GPIO_RISING,
-        sx127x_on_dio2, dev) < 0) {
+    if (!sx127x_gpio_init_int(dev->params.dio2_pin, GPIO_IN, GPIO_PULL_UP,
+        GPIO_RISING, sx127x_on_dio2, dev)) {
         sx127x_log(SX127X_ERROR, "Error: cannot initialize DIO2 pin\n");
     }
 
-    if (sx127x_gpio_init_int(dev->params.dio3_pin, GPIO_IN, GPIO_RISING,
-        sx127x_on_dio3, dev) < 0) {
+    if (!sx127x_gpio_init_int(dev->params.dio3_pin, GPIO_IN, GPIO_PULL_UP,
+        GPIO_RISING, sx127x_on_dio3, dev)) {
         sx127x_log(SX127X_ERROR, "Error: cannot initialize DIO3 pin\n");
     }
 }

@@ -21,6 +21,7 @@ extern "C" {
  */
 typedef enum {
 	SX127X_ERROR,
+	SX127X_WARNING,
 	SX127X_INFO,
 	SX127X_DEBUG
 } sx127x_log_t;
@@ -49,6 +50,12 @@ typedef enum {
 } sx127x_gpio_mode_t;
 
 typedef enum {
+	GPIO_PULL_NONE,
+	GPIO_PULL_UP,
+	GPIO_PULL_DOWN
+} sx127x_gpio_pull_t;
+
+typedef enum {
 	GPIO_RISING
 } sx127x_gpio_int_mode_t;
 
@@ -64,9 +71,10 @@ void sx127x_timer_msleep(uint32_t msecs);
 void sx127x_spi_write(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size);
 void sx127x_spi_read(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size);
 
-bool sx127x_gpio_init(int pin, sx127x_gpio_mode_t mode);
+bool sx127x_gpio_init(int pin, sx127x_gpio_mode_t mode, sx127x_gpio_pull_t pull);
 bool sx127x_gpio_init_int(int pin, sx127x_gpio_mode_t mode,
-	sx127x_gpio_int_mode_t int_mode, sx127x_gpio_handler cb, void *arg);
+	sx127x_gpio_pull_t pull, sx127x_gpio_int_mode_t int_mode,
+	sx127x_gpio_handler cb, void *arg);
 void sx127x_gpio_clear(int pin);
 
 #ifdef __cplusplus
