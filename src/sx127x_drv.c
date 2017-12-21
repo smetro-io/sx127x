@@ -187,7 +187,9 @@ int sx127x_setup(sx127x_t *dev)
 
     /* Launch initialization of driver and device */
     sx127x_log(SX127X_DEBUG, "init_radio: initializing driver...\n");
-    sx127x_init(dev);
+    if (sx127x_init(dev) < 0) {
+        return -1;
+    }
 
     sx127x_init_radio_settings(dev);
     /* Put chip into sleep */

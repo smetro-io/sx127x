@@ -45,7 +45,7 @@ int sx127x_init(sx127x_t *dev)
 {
     /* Check presence of SX127X */
     if (!sx127x_test(dev)) {
-        sx127x_log(SX127X_ERROR, "[Error] init : sx127x test failed\n");
+        sx127x_log(SX127X_ERROR, "[Error] init: sx127x test failed\n");
         return -SX127X_ERR_TEST_FAILED;
     }
 
@@ -183,7 +183,7 @@ static void sx127x_on_dio1(int pin, void *arg)
             }
             break;
         default:
-            sx127x_log(SX127X_DEBUG, "sx127x_on_dio1: Unknown state");
+            sx127x_log(SX127X_DEBUG, "sx127x_on_dio1: Unknown state\n");
             break;
     }
 }
@@ -235,7 +235,7 @@ static void sx127x_on_dio2(int pin, void *arg)
             }
             break;
         default:
-            sx127x_log(SX127X_DEBUG, "sx127x_on_dio2: Unknown state");
+            sx127x_log(SX127X_DEBUG, "sx127x_on_dio2: Unknown state\n");
             break;
     }
 }
@@ -260,7 +260,7 @@ static void sx127x_on_dio3(int pin, void *arg)
             dev->event_callback(dev, SX127X_CAD_DONE);
             break;
         default:
-            sx127x_log(SX127X_DEBUG, "sx127x_on_dio3: Unknown modem");
+            sx127x_log(SX127X_DEBUG, "sx127x_on_dio3: Unknown modem\n");
             break;
     }
 }

@@ -9,7 +9,6 @@
 
 #include "mgos_timers.h"
 #include "mgos_gpio.h"
-#include "mgos_gpio.h"
 #include "mgos_hal.h"
 #include "mgos_spi.h"
 
@@ -82,7 +81,9 @@ void sx127x_spi_write(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size)
     txn.hd.rx_len = 0;
     txn.hd.rx_data = NULL;
     mgos_ints_disable();
-    mgos_spi_run_txn((struct mgos_spi *)spi, false /* full_duplex */, &txn);
+    if (!mgos_spi_run_txn((struct mgos_spi *)spi, false /* full_duplex */, &txn)) {
+        sx127x_log(SX127X_ERROR, "Error during spi write\n");
+    }
     mgos_ints_enable();
 }
 
@@ -104,7 +105,7 @@ void sx127x_spi_read(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size)
     txn.hd.rx_data = buffer;
     mgos_ints_disable();
     if (!mgos_spi_run_txn((struct mgos_spi *)spi, false /* full_duplex */, &txn)) {
-        sx127x_log(SX127X_ERROR, "Error during spi transfer\n");
+        sx127x_log(SX127X_ERROR, "Error during spi read\n");
     }
     mgos_ints_enable();
 }

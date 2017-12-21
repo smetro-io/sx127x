@@ -184,7 +184,7 @@ typedef struct {
  * SX127X hardware and global parameters.
  */
 typedef struct {
-    sx127x_spi_t *spi;             /**< SPI device */
+    sx127x_spi_t *spi;              /**< SPI device */
     int reset_pin;                  /**< Reset pin */
     int dio0_pin;                   /**< Interrupt line DIO0 (Tx done) */
     int dio1_pin;                   /**< Interrupt line DIO1 (Rx timeout) */
