@@ -177,3 +177,19 @@ void sx127x_start_cad(sx127x_t *dev)
             break;
     }
 }
+
+bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold)
+{
+    int16_t rssi = 0;
+
+    sx127x_set_channel(dev, freq);
+    sx127x_set_op_mode(dev, SX127X_RF_OPMODE_RECEIVER);
+
+    sx127x_timer_msleep(1); /* wait 1 millisecond */
+
+    rssi = sx127x_read_rssi(dev);
+    sx127x_set_sleep(dev);
+
+    return (rssi <= rssi_threshold);
+}
+

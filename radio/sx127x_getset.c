@@ -46,6 +46,20 @@ void sx127x_set_state(sx127x_t *dev, uint8_t state)
 
 void sx127x_set_modem(sx127x_t *dev, uint8_t modem)
 {
+    if ((sx127x_reg_read(dev, SX127X_REG_OPMODE) & SX127X_RF_LORA_OPMODE_LONGRANGEMODE_ON) != 0) {
+        dev->settings.modem = SX127X_MODEM_LORA;
+    }
+    else {
+        dev->settings.modem = SX127X_MODEM_FSK;
+    }
+
+    /* Skip if unchanged to avoid resetting the transceiver below (may end up
+     * in crashes) */
+    if (dev->settings.modem == modem) {
+        sx127x_log(SX127X_DEBUG, "[DEBUG] already using modem: %d\n", modem);
+        return;
+    }
+
     sx127x_log(SX127X_DEBUG, "[DEBUG] set modem: %d\n", modem);
 
     dev->settings.modem = modem;
@@ -198,6 +212,12 @@ void sx127x_set_rx(sx127x_t *dev)
             break;
         case SX127X_MODEM_LORA:
         {
+            sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ,
+                             ((sx127x_reg_read(dev, SX127X_REG_LR_INVERTIQ) &
+                               SX127X_RF_LORA_INVERTIQ_TX_MASK &
+                               SX127X_RF_LORA_INVERTIQ_RX_MASK) |
+                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ_RX_ON :SX127X_RF_LORA_INVERTIQ_RX_OFF) |
+                              SX127X_RF_LORA_INVERTIQ_TX_OFF));
             sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ2,
                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ2_ON : SX127X_RF_LORA_INVERTIQ2_OFF));
 
@@ -270,9 +290,9 @@ void sx127x_set_rx(sx127x_t *dev)
     }
 
     sx127x_set_state(dev, SX127X_RF_RX_RUNNING);
-    if (dev->settings.window_timeout != 0) {
+    if (dev->settings.lora.rx_timeout != 0) {
         sx127x_timer_set(&dev->_internal.rx_timeout_timer,
-            dev->settings.window_timeout, dev);
+            dev->settings.lora.rx_timeout, dev);
     }
 
     if (dev->settings.lora.flags & SX127X_RX_CONTINUOUS_FLAG) {
@@ -333,9 +353,9 @@ void sx127x_set_tx(sx127x_t *dev)
     }
 
     sx127x_set_state(dev, SX127X_RF_RX_RUNNING);
-    if (dev->settings.window_timeout != 0) {
+    if (dev->settings.lora.tx_timeout != 0) {
         sx127x_timer_set(&dev->_internal.tx_timeout_timer,
-            dev->settings.window_timeout, dev);
+            dev->settings.lora.tx_timeout, dev);
     }
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_TRANSMITTER );
 }
@@ -406,7 +426,7 @@ uint8_t sx127x_get_bandwidth(const sx127x_t *dev)
     return dev->settings.lora.bandwidth;
 }
 
-inline void _low_datarate_optimize(sx127x_t *dev)
+static void _low_datarate_optimize(sx127x_t *dev)
 {
     if ( ((dev->settings.lora.bandwidth == SX127X_BW_125_KHZ) &&
           ((dev->settings.lora.datarate == SX127X_SF11) ||
@@ -431,7 +451,7 @@ inline void _low_datarate_optimize(sx127x_t *dev)
 #endif
 }
 
-inline void _update_bandwidth(const sx127x_t *dev)
+static void _update_bandwidth(const sx127x_t *dev)
 {
     uint8_t config1_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1);
 #if defined(MODULE_SX1272)
@@ -683,6 +703,7 @@ static inline uint8_t sx127x_get_pa_select(uint32_t channel)
     else {
         return SX127X_RF_PACONFIG_PASELECT_RFO;
     }
+    return SX127X_RF_PACONFIG_PASELECT_PABOOST;
 #endif
 }
 
@@ -755,7 +776,6 @@ void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
         pa_config = ((pa_config & SX127X_RF_PACONFIG_OUTPUTPOWER_MASK) |
                      (uint8_t)((uint16_t)(power + 1) & 0x0F));
     }
-
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, pa_config);
 #if defined(MODULE_SX1272)
     sx127x_reg_write(dev, SX1272_REG_PADAC, pa_dac);
@@ -806,6 +826,11 @@ void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout)
     config2_reg |= (timeout >> 8) & ~SX127X_RF_LORA_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK;
     sx127x_reg_write(dev, SX127X_REG_LR_MODEMCONFIG2, config2_reg);
     sx127x_reg_write(dev, SX127X_REG_LR_SYMBTIMEOUTLSB,timeout & 0xFF);
+}
+
+bool sx127x_get_iq_invert(const sx127x_t *dev)
+{
+    return dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG;
 }
 
 void sx127x_set_iq_invert(sx127x_t *dev, bool iq_invert)

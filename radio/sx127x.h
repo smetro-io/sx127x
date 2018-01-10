@@ -25,10 +25,10 @@ extern "C" {
 #define SX127X_RADIO_WAKEUP_TIME         (1000U)                /**< In microseconds [us] */
 
 #define SX127X_PREAMBLE_LENGTH           (8U)                   /**< Preamble length, same for Tx and Rx */
-#define SX127X_SYMBOL_TIMEOUT            (10U)                  /**< Symbols timeout (s) */
+#define SX127X_SYMBOL_TIMEOUT            (512U)                  /**< Symbols timeout (s) */
 
 #define SX127X_BW_DEFAULT                (SX127X_BW_125_KHZ)    /**< Set default bandwidth to 125kHz */
-#define SX127X_SF_DEFAULT                (SX127X_SF12)          /**< Set default spreading factor to 12 */
+#define SX127X_SF_DEFAULT                (SX127X_SF10)          /**< Set default spreading factor to 12 */
 #define SX127X_CR_DEFAULT                (SX127X_CR_4_8)        /**< Set default coding rate to 8 */
 #define SX127X_FIX_LENGTH_PAYLOAD_ON     (false)                /**< Set fixed payload length on */
 #define SX127X_IQ_INVERSION              (false)                /**< Set inverted IQ on */
@@ -163,7 +163,6 @@ typedef struct {
  */
 typedef struct {
     uint32_t channel;                  /**< Radio channel */
-    uint32_t window_timeout;           /**< Timeout window */
     uint8_t state;                     /**< Radio state */
     uint8_t modem;                     /**< Driver model (FSK or LoRa) */
     sx127x_lora_settings_t lora;       /**< LoRa settings */
@@ -258,6 +257,17 @@ uint32_t sx127x_random(sx127x_t *dev);
  * @param[in] dev                      The sx127x device descriptor
  */
 void sx127x_start_cad(sx127x_t *dev);
+
+/**
+ * Checks that channel is free with specified RSSI threshold.
+ *
+ * @param[in] dev                      The sx127x device structure pointer
+ * @param[in] freq                     channel RF frequency
+ * @param[in] rssi_threshold           RSSI threshold
+ *
+ * @return true if channel is free, false otherwise
+ */
+bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold);
 
 /**
  * Gets current state of transceiver.
@@ -588,6 +598,15 @@ void sx127x_set_rx_timeout(sx127x_t *dev, uint32_t timeout);
  * @param[in] timeout                  The TX timeout
  */
 void sx127x_set_tx_timeout(sx127x_t *dev, uint32_t timeout);
+
+/**
+ * Checks if the SX127X LoRa inverted IQ mode is enabled/disabled
+ *
+ * @param[in] dev                      The sx127x device descriptor
+ *
+ * @return the LoRa IQ inverted mode
+ */
+bool sx127x_get_iq_invert(const sx127x_t *dev);
 
 /**
  * Sets the SX127X LoRa IQ inverted mode

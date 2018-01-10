@@ -8,7 +8,7 @@
 
 #include <pthread.h>
 
-#include <sx127x_hal.h>
+#include "sx127x_hal.h"
 
 #ifdef __cplusplus
 extern "C" {

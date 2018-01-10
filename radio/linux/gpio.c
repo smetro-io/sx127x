@@ -154,7 +154,7 @@ static int gpio_set_value(unsigned int gpio, unsigned int value)
 static void* gpio_handle(void *arg)
 {
 	struct pollfd fdset[1];
-    int fd, rc;
+    int fd, rc, first = 0;
     char *buf[MAX_BUF];
     linux_sx127x_gpio_t *gpio = (linux_sx127x_gpio_t *)arg;
 
@@ -177,9 +177,9 @@ static void* gpio_handle(void *arg)
                 LOG(WARNING, ("Cannot read POLLPRI event"));
                 continue;
             }
-            if (gpio->cb) {
+            if (gpio->cb && first) {
                 gpio->cb(gpio->pin, gpio->arg);
-            }
+            } else first = 1;
         }
     }
     close(fd);

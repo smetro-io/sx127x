@@ -13,7 +13,7 @@
 #include "spi.h"
 #include "log.h"
 
-#define LINUX_SPI_SPEED    200000
+#define LINUX_SPI_SPEED    1000000
 #define LINUX_SPI_MODE     0
 
 static int fd = -1;

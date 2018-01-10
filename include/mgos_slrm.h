@@ -6,6 +6,7 @@
 #ifndef CS_MOS_LIBS_SX127x_SRC_MGOS_H_
 #define CS_MOS_LIBS_SX127x_SRC_MGOS_H_
 
+#include "slrm.h"
 #include "mgos_spi.h"
 #include "sx127x.h"
 #include "sx127x_drv.h"
@@ -14,12 +15,11 @@
 extern "C" {
 #endif
 
-int mgos_sx127x_send(sx127x_t *dev, void *buf, unsigned len);
+slrm_t* mgos_slrm_create(struct mgos_spi* spi, uint8_t* uid, uint8_t* gid,
+  slrm_mode mode, slrm_node_callback node_cb,
+  slrm_gateway_callback gateway_cb);
 
-sx127x_t *mgos_sx127x_create(struct mgos_spi* spi,
-	sx127x_event_callback event_callback);
-
-void mgos_sx127x_close(sx127x_t *dev);
+void mgos_slrm_close(slrm_t *dev);
 
 bool mgos_sx127x_init(void);
 

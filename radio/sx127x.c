@@ -75,7 +75,7 @@ void sx127x_init_radio_settings(sx127x_t *dev)
 
     sx127x_set_fixed_header_len_mode(dev, SX127X_FIXED_HEADER_LEN_MODE);
     sx127x_set_crc(dev, SX127X_PAYLOAD_CRC_ON);
-    sx127x_set_symbol_timeout(dev, SX127X_SYMBOL_TIMEOUT);
+    sx127x_set_symbol_timeout(dev, 512);
     sx127x_set_preamble_length(dev, SX127X_PREAMBLE_LENGTH);
     sx127x_set_payload_length(dev, SX127X_PAYLOAD_LENGTH);
     sx127x_set_hop_period(dev, SX127X_FREQUENCY_HOPPING_PERIOD);
@@ -165,6 +165,7 @@ static void sx127x_on_dio1(int pin, void *arg)
                     /*  Clear Irq */
                     sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS, SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT);
                     sx127x_set_state(dev, SX127X_RF_IDLE);
+                    sx127x_log(SX127X_DEBUG, "receive rx timeout\n");
                     dev->event_callback(dev, SX127X_RX_TIMEOUT);
                     break;
                 default:
