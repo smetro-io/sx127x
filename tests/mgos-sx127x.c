@@ -10,13 +10,19 @@
 #define LED 13
 #define KEY 21
 
-//#define NODE 1
-//#define BUTTON 1
+#define NODE 1
+#define BUTTON 1
 
-static int tx_done = 1;
+enum tx_states {
+    SENDING,
+    SUCCESS,
+    ERROR
+};
+
+static enum tx_states tx_state = SUCCESS;
 
 static void timer_cb(void *arg) {
-    if (tx_done == 2) {
+    if (tx_state == ERROR) {
         mgos_gpio_toggle(LED);
     }
 }
@@ -28,21 +34,27 @@ static void timer2_cb(void *arg) {
 }
 
 static void key_cb(int pin, void *arg) {
-	uint8_t data[] = "123456";
-    LOG(LL_INFO, ("sx127x sending data ..."));
-    slrm_send(data, sizeof(data));
-    tx_done = 0;
-    mgos_gpio_write(LED, 1);
+    LOG(LL_INFO, ("Key pressed"));
+	if (tx_state > 0) {
+        uint8_t data[] = "123456";
+        LOG(LL_INFO, ("sx127x sending data ..."));
+        if (slrm_send(data, sizeof(data))) {
+            tx_state = SENDING;
+            mgos_gpio_write(LED, 1);
+        } else {
+            tx_state = ERROR;
+        }
+    }
 }
 
 static void node_cb(slrm_send_status status, uint8_t *data, size_t len) {
     if (status == SLRM_SEND_SUCCESS) {
         fprintf(stderr, "Received ack from gateway\n");
-        tx_done = 1;
+        tx_state = SUCCESS;
         mgos_gpio_write(LED, 0);
     } else {
         fprintf(stderr, "Error sending data\n");
-        tx_done = 2;
+        tx_state = ERROR;
     }
 }
 
@@ -81,7 +93,7 @@ enum mgos_app_init_result mgos_app_init(void) {
     mgos_set_timer(500, true, timer_cb, NULL);
 #else
     timer2_cb(NULL);
-    mgos_set_timer(15000, true, timer2_cb, NULL);
+    mgos_set_timer(30000, true, timer2_cb, NULL);
 #endif
 #endif
     return MGOS_APP_INIT_SUCCESS;

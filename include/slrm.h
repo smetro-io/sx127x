@@ -42,7 +42,7 @@ typedef struct {
 } slrm_header_t;
 
 void slrm_event_callback(void *param, int event);
-void slrm_send(uint8_t* data, uint8_t len);
+bool slrm_send(uint8_t* data, uint8_t len);
 void slrm_init(slrm_t *mac);
 
 #ifdef __cplusplus

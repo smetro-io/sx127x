@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "sx127x_internal.h"
 #include "sx127x_drv.h"
 #include "sx127x_hal.h"
 #include "slrm.h"
@@ -176,7 +177,8 @@ void slrm_event_callback(void *param, int event) {
 
 }
 
-void slrm_send(uint8_t* data, uint8_t len) {
+bool slrm_send(uint8_t* data, uint8_t len) {
+	uint8_t i;
 	slrm_header_t* header;
 
 	frame.len = sizeof(slrm_header_t) + len;
@@ -190,7 +192,17 @@ void slrm_send(uint8_t* data, uint8_t len) {
 	header->seq = slrm_crc(frame.data + 1, frame.len - 1);
 	
 	frame.retries = 0;
-	sx127x_send(mac->dev, frame.data, frame.len);
+	for (i = 0; i < 4; i++) {
+		if (!sx127x_is_channel_free(mac->dev, SX127X_CHANNEL_DEFAULT, -100)) {
+			uint8_t timeout = sx127x_random(mac->dev) % (12 - 4) + 4;
+			sx127x_timer_msleep(1000 * timeout);
+			continue;
+		}
+		sx127x_send(mac->dev, frame.data, frame.len);
+		return true;
+	}
+	sx127x_log(SX127X_DEBUG, "Cannot send because channel always busy\n");
+	return false;
 }
 
 void slrm_init(slrm_t *data) {

@@ -189,6 +189,7 @@ bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold
 
     rssi = sx127x_read_rssi(dev);
     sx127x_set_sleep(dev);
+    sx127x_log(SX127X_WARNING, "RSSI: %d\n", rssi);
 
     return (rssi <= rssi_threshold);
 }
