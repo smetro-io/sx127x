@@ -23,7 +23,7 @@ typedef enum {
 	SLRM_SEND_SUCCESS,
 } slrm_send_status;
 
-typedef void (*slrm_node_callback)(slrm_send_status status, uint8_t *data, size_t len);
+typedef void (*slrm_node_callback)(uint8_t status, uint8_t *data, size_t len);
 typedef void (*slrm_gateway_callback)(uint8_t *data, size_t *len);
 
 typedef struct {

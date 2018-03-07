@@ -11,8 +11,10 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/radio")
 
 file(GLOB COMMON_SRCS "radio/*.c" "radio/linux/*.c" "slrm/*.c" "slrm/linux/*.c")
+file(GLOB HEADERS "include/linux_slrm.h" "include/slrm.h" "radio/sx127x.h" "radio/sx127x_hal.h")
 add_library(sx127x SHARED ${COMMON_SRCS})
 target_link_libraries(sx127x pthread m)
 install(TARGETS sx127x LIBRARY DESTINATION lib)
+install(FILES ${HEADERS} DESTINATION include/sx127x)
 
 add_subdirectory(tests)

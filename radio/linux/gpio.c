@@ -9,37 +9,32 @@
 #include <fcntl.h>
 #include <poll.h>
 
+#include <sys/stat.h>
+
 #include "gpio.h"
 #include "log.h"
 
 #define SYSFS_GPIO_DIR "/sys/class/gpio"
 #define POLL_TIMEOUT (3 * 1000) /* 3 seconds */
-#define MAX_BUF 32
+#define MAX_BUF 48
 #define MAX_PIN 4
 
 static linux_sx127x_gpio_t gpios[MAX_PIN];
 static int gpio_len = 0;
 static int stop = 1;
 
-static int gpio_export(unsigned int gpio)
+static int gpio_check_export(unsigned int gpio)
 {
-    int fd, len, ret = 0;
-    char buf[MAX_BUF];
- 
-    fd = open(SYSFS_GPIO_DIR "/export", O_WRONLY);
-    if (fd < 0) {
-        LOG(ERROR, ("Error: gpio/export\n"));
-        return fd;
+    char dir[MAX_BUF];
+    struct stat sb;
+
+    snprintf(dir, sizeof(dir), SYSFS_GPIO_DIR  "/gpio%d", gpio);
+
+    if (stat(dir, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+        return 1;
+    } else {
+        return 0;
     }
- 
-    len = snprintf(buf, sizeof(buf), "%d", gpio);
-    if (write(fd, buf, len) < 0) {
-        LOG(WARNING, ("Cannot write export pin\n"));
-        ret = -1;
-    }
-    close(fd);
- 
-    return ret;
 }
 
 static int gpio_unexport(unsigned int gpio)
@@ -61,13 +56,38 @@ static int gpio_unexport(unsigned int gpio)
     return 0;
 }
 
+static int gpio_export(unsigned int gpio)
+{
+    int fd, len, ret = 0;
+    char buf[MAX_BUF];
+
+    if (gpio_check_export(gpio) > 0) {
+        gpio_unexport(gpio);
+    }
+
+    fd = open(SYSFS_GPIO_DIR "/export", O_WRONLY);
+    if (fd < 0) {
+        LOG(ERROR, ("Error: gpio/export\n"));
+        return fd;
+    }
+ 
+    len = snprintf(buf, sizeof(buf), "%d", gpio);
+    if (write(fd, buf, len) < 0) {
+        LOG(WARNING, ("Cannot write export pin\n"));
+        ret = -1;
+    }
+    close(fd);
+ 
+    return ret;
+}
+
 static int gpio_set_dir(unsigned int gpio, unsigned int out_flag)
 {
     int fd, ret = 0;
     char buf[MAX_BUF];
  
     snprintf(buf, sizeof(buf), SYSFS_GPIO_DIR  "/gpio%d/direction", gpio);
- 
+
     fd = open(buf, O_WRONLY);
     if (fd < 0) {
         LOG(ERROR, ("Error: gpio/direction\n"));
@@ -188,7 +208,6 @@ static void* gpio_handle(void *arg)
 
 bool linux_gpio_set_mode(int pin, linux_gpio_mode_t mode)
 {
-    gpio_unexport(pin);
 	if (gpio_export(pin) < 0) return false;
 	if (gpio_set_dir(pin, mode) < 0) return false;
 	return true;

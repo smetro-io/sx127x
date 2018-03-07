@@ -30,7 +30,7 @@ slrm_t *mgos_slrm_create(struct mgos_spi* spi, uint8_t* uid, uint8_t* gid,
     mac->dev->params.spi = spi;
     mac->dev->event_callback = slrm_event_callback;
 
-    const struct sys_config_sx127x *cfg = &get_cfg()->sx127x;
+    const struct mgos_config_sx127x *cfg = mgos_sys_config_get_sx127x();
     if (cfg->rst < 0 || cfg->rst > 34 || cfg->dio0 < 0 || cfg->dio1 > 34 ||
     	cfg->dio2 < 0 || cfg->dio2 > 34 || cfg->dio3 < 0 || cfg->dio3 > 34) {
     	LOG(LL_ERROR, ("Invalid SX127X settings"));

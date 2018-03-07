@@ -52,7 +52,7 @@ slrm_t* linux_slrm_init(linux_slrm_cfg_t *cfg) {
     return mac;
 }
 
-void linux_sx127x_close(slrm_t *mac) {
+void linux_slrm_close(slrm_t *mac) {
     linux_spi_term();
     free(mac->dev);
     free(mac);

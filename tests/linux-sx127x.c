@@ -11,7 +11,7 @@
 
 static bool stop = true;
 
-static void node_cb(slrm_send_status status, uint8_t *data, size_t len) {
+static void node_cb(uint8_t status, uint8_t *data, size_t len) {
     if (status == SLRM_SEND_SUCCESS) {
         fprintf(stderr, "Received ack from gateway\n");
     } else {
@@ -102,5 +102,6 @@ int main(int argc, char *argv[])
     }
     if (node) slrm_send((uint8_t *)data, strlen(data));
     while(stop) sleep(1);
+    linux_slrm_close(mac);
 	return 0;
 }

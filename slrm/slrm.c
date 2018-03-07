@@ -53,11 +53,26 @@ static uint8_t slrm_crc(uint8_t *data, uint8_t len) {
   	return crc;
 }
 
+static bool slrm_collision_avoidance(uint8_t *data, uint8_t len) {
+	uint8_t i;
+	for (i = 0; i < 4; i++) {
+		if (!sx127x_is_channel_free(mac->dev, SX127X_CHANNEL_DEFAULT, -100)) {
+			uint8_t timeout = sx127x_random(mac->dev) % (12 - 4) + 4;
+			sx127x_timer_msleep(1000 * timeout);
+			continue;
+		}
+		sx127x_send(mac->dev, data, len);
+		return true;
+	}
+	sx127x_log(SX127X_DEBUG, "Cannot send because channel always busy\n");
+	return false;
+}
+
 static void slrm_retry(void) {
 	if (frame.retries < 3) {
 		sx127x_log(SX127X_DEBUG, "Try send again %d\n", frame.retries);
 		frame.retries++;
-		sx127x_send(mac->dev, frame.data, frame.len);
+		slrm_collision_avoidance(frame.data, frame.len);
 	} else {
 		sx127x_log(SX127X_DEBUG, "Give up don't try again %d\n", frame.retries);
 		mac->node_cb(SLRM_SEND_FAIL, NULL, 0);
@@ -121,7 +136,6 @@ static void slrm_gateway_recv(void) {
     	sx127x_log(SX127X_DEBUG, "Received incorrect frame\n");
     } else if (slrm_crc(mac->gid, 6) == message[7]) {
     	mac->gateway_cb(message, &len);
-    	sx127x_timer_msleep(1500);
     	sx127x_send(mac->dev, message, len);
 	} else {
 		sx127x_log(SX127X_DEBUG, "Received frame from other network\n");
@@ -138,7 +152,7 @@ void slrm_event_callback(void *param, int event) {
 	        break;
 	    case SX127X_TX_DONE:
 	        sx127x_log(SX127X_DEBUG, "Transmission completed\n");
-	        slrm_rx_single(dev, (1000U * 1000U * 5UL));
+	        slrm_rx_single(dev, (1000U * 1000U * 4UL));
 	        break;
 	    case SX127X_CAD_DONE:
 	        break;
@@ -174,16 +188,14 @@ void slrm_event_callback(void *param, int event) {
 	        break;
 	    }
     }
-
 }
 
 bool slrm_send(uint8_t* data, uint8_t len) {
-	uint8_t i;
 	slrm_header_t* header;
 
 	frame.len = sizeof(slrm_header_t) + len;
 	frame.data = calloc(frame.len, sizeof(uint8_t));
-	memcpy(frame.data + sizeof(slrm_header_t), data, len);
+	memcpy((frame.data + sizeof(slrm_header_t)), data, len);
 
 	/* Create header */
 	header = (slrm_header_t*)frame.data;
@@ -192,17 +204,7 @@ bool slrm_send(uint8_t* data, uint8_t len) {
 	header->seq = slrm_crc(frame.data + 1, frame.len - 1);
 	
 	frame.retries = 0;
-	for (i = 0; i < 4; i++) {
-		if (!sx127x_is_channel_free(mac->dev, SX127X_CHANNEL_DEFAULT, -100)) {
-			uint8_t timeout = sx127x_random(mac->dev) % (12 - 4) + 4;
-			sx127x_timer_msleep(1000 * timeout);
-			continue;
-		}
-		sx127x_send(mac->dev, frame.data, frame.len);
-		return true;
-	}
-	sx127x_log(SX127X_DEBUG, "Cannot send because channel always busy\n");
-	return false;
+	return slrm_collision_avoidance(frame.data, frame.len);
 }
 
 void slrm_init(slrm_t *data) {

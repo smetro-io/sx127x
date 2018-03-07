@@ -6,7 +6,6 @@
 #ifndef LINUX_SLRM_H_
 #define LINUX_SLRM_H_
 
-#include "sx127x.h"
 #include "slrm.h"
 
 #ifdef __cplusplus
