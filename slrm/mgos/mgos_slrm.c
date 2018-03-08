@@ -2,6 +2,7 @@
  * Copyright (c) 2017 Smetro Technologies
  * All rights reserved
  */
+#include "mgos.h"
 #include "mgos_slrm.h"
 
 slrm_t *mgos_slrm_create(struct mgos_spi* spi, uint8_t* uid, uint8_t* gid,

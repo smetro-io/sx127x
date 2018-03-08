@@ -6,7 +6,9 @@
  * directory for more details.
  */
 #include <stdarg.h>
+#include <stdio.h>
 
+#include "mgos.h"
 #include "mgos_timers.h"
 #include "mgos_gpio.h"
 #include "mgos_hal.h"
