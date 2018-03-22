@@ -21,7 +21,7 @@ typedef struct {
 } slrm_frame_t;
 
 static slrm_frame_t frame;
-static uint8_t message[32];
+static uint8_t message[32] = { 0 };
 
 slrm_t *mac = NULL;
 
@@ -106,6 +106,7 @@ static void slrm_node_recv(void) {
 	sx127x_lora_packet_info_t packet_info;
 
     len = sx127x_recv(mac->dev, NULL, 0, 0);
+    memset(message, 0, 32);
     sx127x_recv(mac->dev, message, len, &packet_info);
     sx127x_log(SX127X_DEBUG, "{Payload: (%d bytes), RSSI: %i, SNR: %i, TOA: %i}\n",
         (int)len, packet_info.rssi, (int)packet_info.snr,
@@ -127,6 +128,7 @@ static void slrm_gateway_recv(void) {
 	sx127x_lora_packet_info_t packet_info;
 
     len = sx127x_recv(mac->dev, NULL, 0, 0);
+    memset(message, 0, 32);
     sx127x_recv(mac->dev, message, len, &packet_info);
     sx127x_log(SX127X_DEBUG, "{Payload: (%d bytes), RSSI: %i, SNR: %i, TOA: %i}\n",
         (int)len, packet_info.rssi, (int)packet_info.snr,
