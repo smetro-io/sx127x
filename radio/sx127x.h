@@ -27,8 +27,8 @@ extern "C" {
 #define SX127X_PREAMBLE_LENGTH           (8U)                   /**< Preamble length, same for Tx and Rx */
 #define SX127X_SYMBOL_TIMEOUT            (512U)                  /**< Symbols timeout (s) */
 
-#define SX127X_BW_DEFAULT                (SX127X_BW_125_KHZ)    /**< Set default bandwidth to 125kHz */
-#define SX127X_SF_DEFAULT                (SX127X_SF12)          /**< Set default spreading factor to 12 */
+#define SX127X_BW_DEFAULT                (SX127X_BW_250_KHZ)    /**< Set default bandwidth to 250kHz */
+#define SX127X_SF_DEFAULT                (SX127X_SF7)          /**< Set default spreading factor to 7 */
 #define SX127X_CR_DEFAULT                (SX127X_CR_4_8)        /**< Set default coding rate to 8 */
 #define SX127X_FIX_LENGTH_PAYLOAD_ON     (false)                /**< Set fixed payload length on */
 #define SX127X_IQ_INVERSION              (false)                /**< Set inverted IQ on */

@@ -128,16 +128,20 @@ static void slrm_gateway_recv(void) {
 	sx127x_lora_packet_info_t packet_info;
 
     len = sx127x_recv(mac->dev, NULL, 0, 0);
+    if (len < 8 || len > 32) {
+		sx127x_log(SX127X_DEBUG, "Received incorrect frame\n");
+		return;
+    }
+
     memset(message, 0, 32);
     sx127x_recv(mac->dev, message, len, &packet_info);
     sx127x_log(SX127X_DEBUG, "{Payload: (%d bytes), RSSI: %i, SNR: %i, TOA: %i}\n",
         (int)len, packet_info.rssi, (int)packet_info.snr,
         (int)packet_info.time_on_air);
 
-    if (len < 8 || len > 32) {
-    	sx127x_log(SX127X_DEBUG, "Received incorrect frame\n");
-    } else if (slrm_crc(mac->gid, 6) == message[7]) {
+    if (slrm_crc(mac->gid, 6) == message[7]) {
     	mac->gateway_cb(message, &len);
+		sx127x_timer_msleep(20);
     	sx127x_send(mac->dev, message, len);
 	} else {
 		sx127x_log(SX127X_DEBUG, "Received frame from other network\n");
