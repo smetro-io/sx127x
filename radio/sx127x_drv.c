@@ -41,7 +41,7 @@ int sx127x_send(sx127x_t *dev, void *buf, unsigned len)
          * So wake up the chip */
         if (sx127x_get_op_mode(dev) == SX127X_RF_OPMODE_SLEEP) {
           sx127x_set_standby(dev);
-          sx127x_timer_usleep(SX127X_RADIO_WAKEUP_TIME); /* wait for chip wake up */
+          sx127x_timer_msleep(SX127X_RADIO_WAKEUP_TIME); /* wait for chip wake up */
         }
 
         /* Write payload buffer */
@@ -188,6 +188,7 @@ int sx127x_setup(sx127x_t *dev)
     /* Launch initialization of driver and device */
     sx127x_log(SX127X_DEBUG, "init_radio: initializing driver...\n");
     if (sx127x_init(dev) < 0) {
+        sx127x_log(SX127X_ERROR, "init_radio: error initializing driver!\n");
         return -1;
     }
 

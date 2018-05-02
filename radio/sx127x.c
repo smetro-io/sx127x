@@ -103,7 +103,7 @@ uint32_t sx127x_random(sx127x_t *dev)
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_RECEIVER);
 
     for (unsigned i = 0; i < 32; i++) {
-        sx127x_timer_usleep(1000); /* wait for the chaos */
+        sx127x_timer_msleep(1); /* wait for the chaos */
 
         /* Non-filtered RSSI value reading. Only takes the LSB value */
         rnd |= ((uint32_t) sx127x_reg_read(dev, SX127X_REG_LR_RSSIWIDEBAND) & 0x01) << i;

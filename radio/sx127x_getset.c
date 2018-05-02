@@ -97,9 +97,11 @@ void sx127x_set_syncword(sx127x_t *dev, uint8_t syncword)
 
 uint32_t sx127x_get_channel(const sx127x_t *dev)
 {
-    return (((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * SX127X_FREQUENCY_RESOLUTION;
+    uint32_t temp = 0;
+    temp |= ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16);
+    temp |= ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8);
+    temp |= sx127x_reg_read(dev, SX127X_REG_FRFLSB);
+    return (uint32_t)((double)temp * SX127X_FREQUENCY_RESOLUTION);
 }
 
 void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
@@ -169,7 +171,7 @@ uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
             double t_on_air = t_preamble + t_payload;
 
             /* return milli seconds */
-            air_time = floor(t_on_air * 1e3 + 0.999);
+            air_time = (uint32_t)floor(t_on_air * 1e3 + 0.999);
         }
         break;
     }

@@ -44,7 +44,7 @@ void sx127x_log(sx127x_log_t type, const char *fmt, ...)
 
 void sx127x_timer_set(sx127x_timer_t* timer, int timeout, void *cb_arg)
 {
-	timer->id = mgos_set_timer(timeout / 1000, false, timer->callback, cb_arg);
+	timer->id = mgos_set_timer(timeout, false, timer->callback, cb_arg);
 }
 
 void sx127x_timer_disable(sx127x_timer_t* timer)
@@ -149,6 +149,10 @@ bool sx127x_gpio_init_int(int pin, sx127x_gpio_mode_t mode,
         }
         if (!mgos_gpio_enable_int(pin)) return false;
         break;
+    case GPIO_FALLING:
+        break;
+    case GPIO_RISING_FALLING:
+        break;         
     }
     return true;
 }

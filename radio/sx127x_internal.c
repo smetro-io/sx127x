@@ -21,7 +21,6 @@ bool sx127x_test(const sx127x_t *dev)
 {
     /* Read version number and compare with sx127x assigned revision */
     uint8_t version = sx127x_reg_read(dev, SX127X_REG_VERSION);
-
 #if defined(MODULE_SX1272)
     if (version != VERSION_SX1272) {
         sx127x_log(SX127X_ERROR, "[Error] sx1272 test failed, invalid version number: %d\n",
@@ -48,7 +47,7 @@ void sx127x_reg_write(const sx127x_t *dev, uint8_t addr, uint8_t data)
 
 uint8_t sx127x_reg_read(const sx127x_t *dev, uint8_t addr)
 {
-    uint8_t data;
+    uint8_t data = 0;
 
     sx127x_reg_read_burst(dev, addr, &data, 1);
 
@@ -81,12 +80,14 @@ void sx127x_rx_chain_calibration(sx127x_t *dev)
 {
     uint8_t reg_pa_config_init_val;
     uint32_t initial_freq;
+    uint32_t temp = 0;
 
     /* Save context */
     reg_pa_config_init_val = sx127x_reg_read(dev, SX127X_REG_PACONFIG);
-    initial_freq = (double) (((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16)
-                             | ((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8)
-                             | ((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * (double) SX127X_FREQUENCY_RESOLUTION;
+    temp |= ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16);
+    temp |= ((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8);
+    temp |= sx127x_reg_read(dev, SX127X_REG_FRFLSB);
+    initial_freq = (uint32_t)((double)temp * SX127X_FREQUENCY_RESOLUTION);
 
     /* Cut the PA just in case, RFO output, power = -1 dBm */
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, 0x00);

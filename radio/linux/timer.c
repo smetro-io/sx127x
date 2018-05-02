@@ -14,7 +14,7 @@ void* linux_timer_handle(void *arg) {
 		LOG(WARNING, ("Invalid timer argument\n"));
         return NULL;
 	}
-	usleep(timer->timeout);
+	usleep(timer->timeout * 1000);
 	if (timer->enable) {
 		timer->callback(timer->cb_arg);
 	}

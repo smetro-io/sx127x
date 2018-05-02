@@ -56,7 +56,9 @@ typedef enum {
 } sx127x_gpio_pull_t;
 
 typedef enum {
-	GPIO_RISING
+	GPIO_RISING,
+	GPIO_FALLING,
+	GPIO_RISING_FALLING,	
 } sx127x_gpio_int_mode_t;
 
 typedef void (*sx127x_gpio_handler)(int pin, void *arg);

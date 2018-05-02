@@ -22,7 +22,7 @@ extern "C" {
 #define SX127X_RF_MID_BAND_THRESH        (525000000UL)          /**< Mid-band threshold */
 #define SX127X_FREQUENCY_RESOLUTION      (61.03515625)          /**< Frequency resolution in Hz */
 #define SX127X_XTAL_FREQ                 (32000000UL)           /**< Internal oscillator frequency, 32MHz */
-#define SX127X_RADIO_WAKEUP_TIME         (1000U)                /**< In microseconds [us] */
+#define SX127X_RADIO_WAKEUP_TIME         (1U)                   /**< In miliseconds [ms] */
 
 #define SX127X_PREAMBLE_LENGTH           (8U)                   /**< Preamble length, same for Tx and Rx */
 #define SX127X_SYMBOL_TIMEOUT            (512U)                  /**< Symbols timeout (s) */
@@ -38,7 +38,7 @@ extern "C" {
 #define SX127X_PAYLOAD_CRC_ON            (true)                 /**< Enable payload CRC, optional */
 #define SX127X_PAYLOAD_LENGTH            (0U)                   /**< Set payload length, unused with implicit header */
 
-#define SX127X_TX_TIMEOUT_DEFAULT        (1000U * 1000U * 30UL) /**< TX timeout, 30s */
+#define SX127X_TX_TIMEOUT_DEFAULT        (1000U * 4UL)         /**< TX timeout, 4s */
 #define SX127X_RX_SINGLE                 (false)                /**< Single byte receive mode => continuous by default */
 #define SX127X_RX_BUFFER_SIZE            (256)                  /**< RX buffer size */
 

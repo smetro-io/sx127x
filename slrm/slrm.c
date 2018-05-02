@@ -15,7 +15,7 @@
 #define CRC8_INITIAL_CRC 0x00
 
 typedef struct {
-	uint8_t *data;
+	uint8_t data[32];
 	uint8_t len;
 	uint8_t retries;
 } slrm_frame_t;
@@ -76,7 +76,6 @@ static void slrm_retry(void) {
 	} else {
 		sx127x_log(SX127X_DEBUG, "Give up don't try again %d\n", frame.retries);
 		mac->node_cb(SLRM_SEND_FAIL, NULL, 0);
-		free(frame.data);
     }
 }
 
@@ -115,7 +114,6 @@ static void slrm_node_recv(void) {
     if (slrm_check_frame(message, len)) {
     	sx127x_log(SX127X_DEBUG, "Received ack from last frame\n", frame.retries);
     	mac->node_cb(SLRM_SEND_SUCCESS, message + sizeof(slrm_header_t), len - sizeof(slrm_header_t));
-    	free(frame.data);
     	sx127x_set_sleep(mac->dev);
     } else {
     	sx127x_log(SX127X_DEBUG, "Received other frame\n", frame.retries);
@@ -129,8 +127,8 @@ static void slrm_gateway_recv(void) {
 
     len = sx127x_recv(mac->dev, NULL, 0, 0);
     if (len < 8 || len > 32) {
-		sx127x_log(SX127X_DEBUG, "Received incorrect frame\n");
-		return;
+    	sx127x_log(SX127X_DEBUG, "Received incorrect frame\n");
+    	return;
     }
 
     memset(message, 0, 32);
@@ -139,9 +137,9 @@ static void slrm_gateway_recv(void) {
         (int)len, packet_info.rssi, (int)packet_info.snr,
         (int)packet_info.time_on_air);
 
-    if (slrm_crc(mac->gid, 6) == message[7]) {
+	if (slrm_crc(mac->gid, 6) == message[7]) {
     	mac->gateway_cb(message, &len);
-		sx127x_timer_msleep(20);
+    	sx127x_timer_msleep(20);
     	sx127x_send(mac->dev, message, len);
 	} else {
 		sx127x_log(SX127X_DEBUG, "Received frame from other network\n");
@@ -158,7 +156,7 @@ void slrm_event_callback(void *param, int event) {
 	        break;
 	    case SX127X_TX_DONE:
 	        sx127x_log(SX127X_DEBUG, "Transmission completed\n");
-	        slrm_rx_single(dev, (1000U * 1000U * 4UL));
+	        slrm_rx_single(dev, (1000U * 4UL));
 	        break;
 	    case SX127X_CAD_DONE:
 	        break;
@@ -168,7 +166,6 @@ void slrm_event_callback(void *param, int event) {
 	    case SX127X_TX_TIMEOUT:
 	    	sx127x_log(SX127X_WARNING, "Transmission timeout\n");
 	    	mac->node_cb(SLRM_SEND_FAIL, NULL, 0);
-	    	free(frame.data);
 	    	sx127x_set_sleep(dev);
 	        break;
 	    default:
@@ -200,7 +197,6 @@ bool slrm_send(uint8_t* data, uint8_t len) {
 	slrm_header_t* header;
 
 	frame.len = sizeof(slrm_header_t) + len;
-	frame.data = calloc(frame.len, sizeof(uint8_t));
 	memcpy((frame.data + sizeof(slrm_header_t)), data, len);
 
 	/* Create header */
