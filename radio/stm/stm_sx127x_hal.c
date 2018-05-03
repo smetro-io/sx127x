@@ -22,6 +22,7 @@
 #include "sx127x_hal.h"
 
 void sx127x_log(sx127x_log_t type, const char *fmt, ...) {
+#ifdef UART_DEBUG    
 	va_list args;
     char dest[256];
 	va_start(args, fmt);
@@ -41,6 +42,7 @@ void sx127x_log(sx127x_log_t type, const char *fmt, ...) {
 		LOG("LOG_DEBUG: %s\r\n", (dest));
 		break;
 	}
+#endif
 }
 
 void sx127x_timer_set(sx127x_timer_t* timer, int timeout, void *cb_arg) {
@@ -53,7 +55,7 @@ void sx127x_timer_disable(sx127x_timer_t* timer) {
 }
 
 void sx127x_timer_msleep(uint32_t msecs) {
-    sleep_ms(msecs);
+    delay_ms(msecs);
 }
 
 void sx127x_spi_write(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size) {
