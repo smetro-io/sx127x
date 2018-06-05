@@ -10,6 +10,8 @@
 #include "sx127x_hal.h"
 #include "slrm.h"
 
+#define MAX_SEND_ATTEMPTS	2
+
 /* An 8-bit CRC is used to validate the readings */
 #define CRC8_POLYNOMIAL 0x131
 #define CRC8_INITIAL_CRC 0x00
@@ -55,10 +57,10 @@ static uint8_t slrm_crc(uint8_t *data, uint8_t len) {
 
 static bool slrm_collision_avoidance(uint8_t *data, uint8_t len) {
 	uint8_t i;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 3; i++) {
 		if (!sx127x_is_channel_free(mac->dev, SX127X_CHANNEL_DEFAULT, -100)) {
-			uint8_t timeout = sx127x_random(mac->dev) % (12 - 4) + 4;
-			sx127x_timer_msleep(1000 * timeout);
+			uint8_t timeout = (sx127x_random(mac->dev) % 5) + 3;
+			sx127x_timer_msleep(100 * timeout);
 			continue;
 		}
 		sx127x_send(mac->dev, data, len);
@@ -69,13 +71,15 @@ static bool slrm_collision_avoidance(uint8_t *data, uint8_t len) {
 }
 
 static void slrm_retry(void) {
-	if (frame.retries < 3) {
+	if (frame.retries < MAX_SEND_ATTEMPTS) {
 		sx127x_log(SX127X_DEBUG, "Try send again %d\n", frame.retries);
 		frame.retries++;
 		slrm_collision_avoidance(frame.data, frame.len);
 	} else {
 		sx127x_log(SX127X_DEBUG, "Give up don't try again %d\n", frame.retries);
-		mac->node_cb(SLRM_SEND_FAIL, NULL, 0);
+		slrm_error_type err = SLRM_RECEIVE_NULL;
+		mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
+		sx127x_set_sleep(mac->dev);
     }
 }
 
@@ -165,7 +169,8 @@ void slrm_event_callback(void *param, int event) {
 	    	break;
 	    case SX127X_TX_TIMEOUT:
 	    	sx127x_log(SX127X_WARNING, "Transmission timeout\n");
-	    	mac->node_cb(SLRM_SEND_FAIL, NULL, 0);
+	    	slrm_error_type err = SLRM_SEND_TIMEOUT;
+	    	mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
 	    	sx127x_set_sleep(dev);
 	        break;
 	    default:

@@ -23,6 +23,11 @@ typedef enum {
 	SLRM_SEND_SUCCESS,
 } slrm_send_status;
 
+typedef enum {
+	SLRM_SEND_TIMEOUT,
+	SLRM_RECEIVE_NULL,
+} slrm_error_type;
+
 typedef void (*slrm_node_callback)(uint8_t status, uint8_t *data, size_t len);
 typedef void (*slrm_gateway_callback)(uint8_t *data, size_t *len);
 
