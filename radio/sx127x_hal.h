@@ -63,7 +63,13 @@ typedef enum {
 
 typedef void (*sx127x_gpio_handler)(int pin, void *arg);
 
-void sx127x_log(sx127x_log_t type, const char *fmt, ...);
+#ifdef UART_DEBUG
+#define sx127x_log(type, str, ...)  sx127x_log_print(type, str, ##__VA_ARGS__)
+#else
+#define sx127x_log(type, str, ...) 0
+#endif
+
+void sx127x_log_print(sx127x_log_t type, const char *fmt, ...);
 
 void sx127x_timer_set(sx127x_timer_t* timer, int timeout, void *cb_arg);
 void sx127x_timer_disable(sx127x_timer_t* timer);

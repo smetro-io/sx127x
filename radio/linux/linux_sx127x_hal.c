@@ -16,7 +16,7 @@
 #include "gpio.h"
 #include "log.h"
 
-void sx127x_log(sx127x_log_t type, const char *fmt, ...)
+void sx127x_log_print(sx127x_log_t type, const char *fmt, ...)
 {
 	va_list args;
     char dest[1024];
@@ -59,7 +59,7 @@ void sx127x_spi_write(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size)
     spi_xfer[0].len = size + 1;
 
     if (linux_spi_transfer(spi_xfer, 1) < 0) {
-        sx127x_log(SX127X_ERROR, "Error during spi write\n");
+        sx127x_log_print(SX127X_ERROR, "Error during spi write\n");
     }
 }
 
@@ -75,7 +75,7 @@ void sx127x_spi_read(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size)
     spi_xfer[1].len = size;
 
     if (linux_spi_transfer(spi_xfer, 2) < 0) {
-        sx127x_log(SX127X_ERROR, "Error during spi read\n");
+        sx127x_log_print(SX127X_ERROR, "Error during spi read\n");
     }
 }
 

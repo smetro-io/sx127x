@@ -3,9 +3,10 @@ cmake_minimum_required(VERSION 2.8)
 project(sx127x)
 
 # -g --ggdb3
-add_definitions(-O5 -Wall -std=gnu99 -Wno-deprecated-declarations
+add_definitions(-O5 -Wall -std=gnu99 -Wno-deprecated-declarations -Wno-unused-value
 #add_definitions(-O0 -Wall -std=gnu99 -Wno-deprecated-declarations
 )
+add_definitions(-DUART_DEBUG)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/radio")

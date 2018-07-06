@@ -21,7 +21,7 @@
 
 #include "sx127x_hal.h"
 
-void sx127x_log(sx127x_log_t type, const char *fmt, ...) {
+void sx127x_log_print(sx127x_log_t type, const char *fmt, ...) {
 	va_list args;
     char dest[256];
 	va_start(args, fmt);
