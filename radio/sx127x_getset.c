@@ -122,7 +122,7 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
 uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
 {
     uint32_t air_time = 0;
-
+#ifndef OPTIMIZATION
     switch (dev->settings.modem) {
         case SX127X_MODEM_FSK:
             /* todo */
@@ -175,7 +175,7 @@ uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
         }
         break;
     }
-
+#endif
     return air_time;
 }
 
