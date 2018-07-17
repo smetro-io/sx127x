@@ -84,7 +84,7 @@ static void slrm_retry(void) {
 }
 
 static uint8_t slrm_check_frame(uint8_t* data, uint8_t len) {
-	if ((frame.data[0] == data[0]) && (frame.data[7] == data[7])) {
+	if ((frame.data[0] == data[0]) && (frame.data[sizeof(slrm_header_t) - 1] == data[sizeof(slrm_header_t) - 1])) {
 		return 1;
 	} else {
 		return 0;
@@ -141,7 +141,7 @@ static void slrm_gateway_recv(void) {
         (int)len, packet_info.rssi, (int)packet_info.snr,
         (int)packet_info.time_on_air);
 
-	if (slrm_crc(mac->gid, 6) == message[7]) {
+	if (slrm_crc(mac->gid, 6) == message[sizeof(slrm_header_t) - 1]) {
     	mac->gateway_cb(message, &len);
     	sx127x_timer_msleep(20);
     	sx127x_send(mac->dev, message, len);
@@ -206,8 +206,8 @@ bool slrm_send(uint8_t* data, uint8_t len) {
 
 	/* Create header */
 	header = (slrm_header_t*)frame.data;
-	memcpy(&header->uid, mac->uid, 6);
-	header->nid = slrm_crc(mac->gid, 6);
+	memcpy(&header->uid, mac->uid, sizeof(mac->uid));
+	header->nid = slrm_crc(mac->gid, sizeof(mac->gid));
 	header->seq = slrm_crc(frame.data + 1, frame.len - 1);
 	
 	frame.retries = 0;

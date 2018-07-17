@@ -20,7 +20,7 @@ typedef struct {
 	int dio3;
 	char* spi;
 	slrm_mode mode;
-	uint8_t uid[6];
+	uint8_t uid[4];
 	uint8_t gid[6];
     slrm_node_callback node_cb;
     slrm_gateway_callback gateway_cb;

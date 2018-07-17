@@ -33,7 +33,7 @@ typedef void (*slrm_gateway_callback)(uint8_t *data, size_t *len);
 
 typedef struct {
 	slrm_mode mode;
-	uint8_t uid[6];
+	uint8_t uid[4];
 	uint8_t gid[6];
     slrm_node_callback node_cb;
     slrm_gateway_callback gateway_cb;
@@ -42,9 +42,9 @@ typedef struct {
 
 typedef struct {
 	uint8_t seq;
-	uint8_t uid[6];
+	uint8_t uid[4];
 	uint8_t nid;
-} slrm_header_t;
+} __attribute__((__packed__)) slrm_header_t;
 
 void slrm_event_callback(void *param, int event);
 bool slrm_send(uint8_t* data, uint8_t len);

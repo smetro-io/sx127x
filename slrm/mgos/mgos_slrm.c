@@ -12,8 +12,8 @@ slrm_t *mgos_slrm_create(struct mgos_spi* spi, uint8_t* uid, uint8_t* gid,
     if (mac == NULL) return NULL;	
 
     mac->mode = mode;
-    memcpy(mac->uid, uid, 6);
-    memcpy(mac->gid, gid, 6);
+    memcpy(mac->uid, uid, sizeof(mac->uid));
+    memcpy(mac->gid, gid, sizeof(mac->gid));
     mac->node_cb = node_cb;
     mac->gateway_cb = gateway_cb;
 

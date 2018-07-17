@@ -115,7 +115,14 @@ bool sx127x_gpio_init_int(int pin, sx127x_gpio_mode_t mode,
             return false;
         }
         break;
+    case GPIO_FALLING:
+
+        break; 
+    case GPIO_RISING_FALLING:
+
+        break;                
     }
+
     return true;
 }
 

@@ -65,11 +65,11 @@ static void gateway_cb(uint8_t *data, size_t *len) {
 
 static void init_lora(void) {
 #ifdef NODE
-    uint8_t uid[6] = { 0x01, 0xaa, 0x02, 0xbb, 0x03, 0xcc };
+    uint8_t uid[4] = { 0x01, 0xaa, 0x02, 0xbb };
     uint8_t gid[6] = { 0xcc, 0xcc, 0xcc, 0xaa, 0xaa, 0xaa };
     mgos_slrm_create(mgos_spi_get_global(), uid, gid, SLRM_NODE, node_cb, NULL); 
 #else
-    uint8_t gid[6] = { 0xcc, 0xcc, 0xcc, 0xaa, 0xaa, 0xaa };
+    uint8_t gid[4] = { 0xcc, 0xcc, 0xcc, 0xaa };
     uint8_t uid[6] = { 0xcc, 0xcc, 0xcc, 0xaa, 0xaa, 0xaa };
     mgos_slrm_create(mgos_spi_get_global(), uid, gid, SLRM_GATEWAY, NULL, gateway_cb); 
 #endif

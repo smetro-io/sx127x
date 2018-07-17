@@ -81,14 +81,14 @@ int main(int argc, char *argv[])
 	cfg.spi = "/dev/spidev1.0";
 
 	if (gateway) {
-        uint8_t uid[6] = { 0xcc, 0xcc, 0xcc, 0xaa, 0xaa, 0xaa };
+        uint8_t uid[4] = { 0xcc, 0xcc, 0xcc, 0xaa };
         uint8_t gid[6] = { 0xcc, 0xcc, 0xcc, 0xaa, 0xaa, 0xaa };
         cfg.mode = SLRM_GATEWAY;
         cfg.gateway_cb = gateway_cb;
         memcpy(cfg.uid, uid, 6);
         memcpy(cfg.gid, gid, 6);
 	} else if (node) {
-        uint8_t uid[6] = { 0x01, 0xaa, 0x02, 0xbb, 0x03, 0xcc };
+        uint8_t uid[4] = { 0x01, 0xaa, 0x02, 0xbb };
         uint8_t gid[6] = { 0xcc, 0xcc, 0xcc, 0xaa, 0xaa, 0xaa };
         cfg.mode = SLRM_NODE;
         cfg.node_cb = node_cb;
