@@ -29,12 +29,11 @@ typedef enum {
 } slrm_error_type;
 
 typedef void (*slrm_node_callback)(uint8_t status, uint8_t *data, size_t len);
-typedef void (*slrm_gateway_callback)(uint8_t *data, size_t *len);
+typedef bool (*slrm_gateway_callback)(uint8_t *data, size_t *len);
 
 typedef struct {
 	slrm_mode mode;
-	uint8_t uid[4];
-	uint8_t gid[6];
+	uint8_t id[4];
     slrm_node_callback node_cb;
     slrm_gateway_callback gateway_cb;
     sx127x_t *dev;
@@ -42,8 +41,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t seq;
-	uint8_t uid[4];
-	uint8_t nid;
+	uint8_t id[4];
 } __attribute__((__packed__)) slrm_header_t;
 
 void slrm_event_callback(void *param, int event);

@@ -16,8 +16,7 @@ slrm_t* linux_slrm_init(linux_slrm_cfg_t *cfg) {
     if (mac == NULL) return NULL;
 
     mac->mode = cfg->mode;
-    memcpy(mac->uid, cfg->uid, sizeof(mac->uid));
-    memcpy(mac->gid, cfg->gid, sizeof(mac->gid));
+    memcpy(mac->id, cfg->id, sizeof(mac->id));
     mac->node_cb = cfg->node_cb;
     mac->gateway_cb = cfg->gateway_cb;
 

@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-slrm_t* stm_slrm_create(uint8_t* uid, uint8_t* gid,
+slrm_t* stm_slrm_create(uint8_t* id,
   slrm_mode mode, slrm_node_callback node_cb,
   slrm_gateway_callback gateway_cb);
 

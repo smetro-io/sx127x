@@ -16,7 +16,3 @@ See https://github.com/RIOT-OS/RIOT/tree/master/drivers/sx127x
 For Linux the driver is a library, we test using an Orange Pi Zero. To compile follow the instructions:
 
 	$ sudo apt-get install gcc-arm-linux-gnueabihf
-	$ cd sx127x
-	$ ./builder.sh armhf
-	$ cd build.armhf
-	$ make

@@ -11,15 +11,14 @@
 static slrm_t s_mac;
 static sx127x_t s_dev;
 
-slrm_t *stm_slrm_create(uint8_t* uid, uint8_t* gid,
+slrm_t *stm_slrm_create(uint8_t* id,
     slrm_mode mode, slrm_node_callback node_cb,
     slrm_gateway_callback gateway_cb) {
 
     slrm_t *mac = &s_mac;
 
     mac->mode = mode;
-    memcpy(mac->uid, uid, sizeof(mac->uid));
-    memcpy(mac->gid, gid, sizeof(mac->gid));
+    memcpy(mac->id, id, sizeof(mac->id));
     mac->node_cb = node_cb;
     mac->gateway_cb = gateway_cb;
 
