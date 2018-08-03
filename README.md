@@ -1,18 +1,17 @@
-# sx127x
-Semtech SX1272 and SX1276 radios driver for Mongoose OS and Linux
+## sx127x
 
-## Description
-This library contains the driver for radio devices of the Semtech SX127x series (SX1272 and SX1276). Only LoRa long range modem is supported at the moment.
+### Compile:
 
-For more information on Semtech SX1272 and SX1276 modules see:
-* [SX1272/73 datasheet](http://www.semtech.com/images/datasheet/sx1272.pdf)
-* [SX1276/77/78/79 datasheet](http://www.semtech.com/images/datasheet/sx1276_77_78_79.pdf)
+    $ mkdir build
+    $ cd build
+    $ cmake ../
+    $ make
+    $ make install
 
-Based on RIOT-OS sx127x driver.
+### Cross Compile:
 
-See https://github.com/RIOT-OS/RIOT/tree/master/drivers/sx127x
-
-## Linux
-For Linux the driver is a library, we test using an Orange Pi Zero. To compile follow the instructions:
-
-	$ sudo apt-get install gcc-arm-linux-gnueabihf
+    $ mkdir build
+    $ cd build
+    $ cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake ../
+    $ make
+    $ make install
