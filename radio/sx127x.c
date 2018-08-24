@@ -61,17 +61,17 @@ int sx127x_init(sx127x_t *dev)
     return SX127X_INIT_OK;
 }
 
-void sx127x_init_radio_settings(sx127x_t *dev)
+void sx127x_init_radio_settings(sx127x_t *dev, sx127x_radio_settings_t *radio)
 {
     sx127x_set_freq_hop(dev, SX127X_FREQUENCY_HOPPING);
     sx127x_set_iq_invert(dev, SX127X_IQ_INVERSION);
     sx127x_set_rx_single(dev, SX127X_RX_SINGLE);
     sx127x_set_tx_timeout(dev, SX127X_TX_TIMEOUT_DEFAULT);
     sx127x_set_modem(dev, SX127X_MODEM_DEFAULT);
-    sx127x_set_channel(dev, SX127X_CHANNEL_DEFAULT);
-    sx127x_set_bandwidth(dev, SX127X_BW_DEFAULT);
-    sx127x_set_spreading_factor(dev, SX127X_SF_DEFAULT);
-    sx127x_set_coding_rate(dev, SX127X_CR_DEFAULT);
+    sx127x_set_channel(dev, radio->channel);
+    sx127x_set_bandwidth(dev, radio->lora.bandwidth);
+    sx127x_set_spreading_factor(dev, radio->lora.datarate);
+    sx127x_set_coding_rate(dev, radio->lora.coderate);
 
     sx127x_set_fixed_header_len_mode(dev, SX127X_FIXED_HEADER_LEN_MODE);
     sx127x_set_crc(dev, SX127X_PAYLOAD_CRC_ON);

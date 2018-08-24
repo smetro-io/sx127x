@@ -58,7 +58,7 @@ static uint8_t slrm_crc(uint8_t *data, uint8_t len) {
 static bool slrm_collision_avoidance(uint8_t *data, uint8_t len) {
 	uint8_t i;
 	for (i = 0; i < 3; i++) {
-		if (!sx127x_is_channel_free(mac->dev, SX127X_CHANNEL_DEFAULT, -100)) {
+		if (!sx127x_is_channel_free(mac->dev, mac->dev->settings.channel, -100)) {
 			uint8_t timeout = (sx127x_random(mac->dev) % 5) + 3;
 			sx127x_timer_msleep(100 * timeout);
 			continue;
@@ -78,7 +78,8 @@ static void slrm_retry(void) {
 	} else {
 		sx127x_log(SX127X_DEBUG, "Give up don't try again %d\n", frame.retries);
 		slrm_error_type err = SLRM_RECEIVE_NULL;
-		mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
+		if(mac->node_cb != NULL)
+			mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
 		sx127x_set_sleep(mac->dev);
     }
 }
@@ -118,11 +119,15 @@ static void slrm_node_recv(void) {
 
     if (slrm_check_frame(message, len)) {
     	sx127x_log(SX127X_DEBUG, "Received ack from last frame\n", frame.retries);
-    	mac->node_cb(SLRM_SEND_SUCCESS, message + sizeof(slrm_header_t), len - sizeof(slrm_header_t));
+    	if(mac->node_cb != NULL)
+    		mac->node_cb(SLRM_SEND_SUCCESS, message + sizeof(slrm_header_t), len - sizeof(slrm_header_t));
     	sx127x_set_sleep(mac->dev);
     } else {
     	sx127x_log(SX127X_DEBUG, "Received other frame\n", frame.retries);
-    	slrm_retry();
+    	slrm_error_type err = SLRM_RECEIVE_NULL;
+    	if(mac->node_cb != NULL)
+    		mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
+    	sx127x_set_sleep(mac->dev);	 
     }
 }
 
@@ -142,15 +147,18 @@ static void slrm_gateway_recv(void) {
         (int)len, packet_info.rssi, (int)packet_info.snr,
         (int)packet_info.time_on_air);
 
-    if(mac->gateway_cb(message, &len)) {
-    	sx127x_timer_msleep(20);
-    	sx127x_send(mac->dev, message, len);
-	} else {
-		sx127x_log(SX127X_DEBUG, "Received frame from other network\n");
-	}
+    if(mac->gateway_cb != NULL) {
+	    if(mac->gateway_cb(message, &len)) {
+	    	sx127x_timer_msleep(20);
+	    	//sx127x_send(mac->dev, message, len);
+		} else {
+			sx127x_log(SX127X_DEBUG, "Received frame from other network\n");
+		}		
+    }
 }
 
 void slrm_event_callback(void *param, int event) {
+	slrm_error_type err;	
     sx127x_t *dev = (sx127x_t *)param;
 
     if (mac->mode == SLRM_NODE) {
@@ -165,12 +173,18 @@ void slrm_event_callback(void *param, int event) {
 	    case SX127X_CAD_DONE:
 	        break;
 	    case SX127X_RX_TIMEOUT:
-			slrm_retry();
+			//slrm_retry();
+	    	sx127x_log(SX127X_WARNING, "Receive timeout\n");
+	    	err = SLRM_RECEIVE_NULL;
+	    	if(mac->node_cb != NULL)
+	    		mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
+	    	sx127x_set_sleep(mac->dev);	    
 	    	break;
 	    case SX127X_TX_TIMEOUT:
 	    	sx127x_log(SX127X_WARNING, "Transmission timeout\n");
-	    	slrm_error_type err = SLRM_SEND_TIMEOUT;
-	    	mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
+	    	err = SLRM_SEND_TIMEOUT;
+	    	if(mac->node_cb != NULL)
+	    		mac->node_cb(SLRM_SEND_FAIL, (uint8_t*)&err, 1);
 	    	sx127x_set_sleep(dev);
 	        break;
 	    default:

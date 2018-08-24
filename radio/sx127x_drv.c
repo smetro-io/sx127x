@@ -175,11 +175,11 @@ int sx127x_recv(sx127x_t *dev, void *buf, size_t len,
     return size;
 }
 
-int sx127x_setup(sx127x_t *dev)
+int sx127x_setup(sx127x_t *dev, sx127x_radio_settings_t *radio)
 {
     dev->irq = 0;
     sx127x_radio_settings_t settings;
-    settings.channel = SX127X_CHANNEL_DEFAULT;
+    settings.channel = radio->channel;
     settings.modem = SX127X_MODEM_DEFAULT;
     settings.state = SX127X_RF_IDLE;
 
@@ -192,7 +192,7 @@ int sx127x_setup(sx127x_t *dev)
         return -1;
     }
 
-    sx127x_init_radio_settings(dev);
+    sx127x_init_radio_settings(dev, radio);
     /* Put chip into sleep */
     sx127x_set_sleep(dev);
 

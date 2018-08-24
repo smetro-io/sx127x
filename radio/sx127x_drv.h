@@ -87,7 +87,7 @@ int sx127x_recv(sx127x_t *dev, void *buf, size_t len,
 /**
  * Driver's setup function
  */
-int sx127x_setup(sx127x_t *dev);
+int sx127x_setup(sx127x_t *dev, sx127x_radio_settings_t *radio);
 
 /**
  * Get an option value from device
