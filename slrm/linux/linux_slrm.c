@@ -41,7 +41,7 @@ slrm_t* linux_slrm_init(linux_slrm_cfg_t *cfg) {
     mac->dev->params.dio2_pin = cfg->dio2;
     mac->dev->params.dio3_pin = cfg->dio3;
 
-    if (sx127x_setup(mac->dev) < 0) {
+    if (sx127x_setup(mac->dev, NULL) < 0) {
         free(mac->dev);
         free(mac);
         return NULL;

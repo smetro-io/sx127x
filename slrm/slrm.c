@@ -58,7 +58,7 @@ static uint8_t slrm_crc(uint8_t *data, uint8_t len) {
 static bool slrm_collision_avoidance(uint8_t *data, uint8_t len) {
 	uint8_t i;
 	for (i = 0; i < 3; i++) {
-		if (!sx127x_is_channel_free(mac->dev, SX127X_CHANNEL_DEFAULT, -100)) {
+		if (!sx127x_is_channel_free(mac->dev, mac->dev->settings.channel, -100)) {
 			uint8_t timeout = (sx127x_random(mac->dev) % 5) + 3;
 			sx127x_timer_msleep(100 * timeout);
 			continue;

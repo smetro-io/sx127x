@@ -10,6 +10,7 @@
 
 static slrm_t s_mac;
 static sx127x_t s_dev;
+static sx127x_radio_settings_t s_radio;
 
 slrm_t *stm_slrm_create(uint8_t* id,
     slrm_mode mode, slrm_node_callback node_cb,
@@ -33,7 +34,13 @@ slrm_t *stm_slrm_create(uint8_t* id,
     mac->dev->params.dio2_pin = DIO2_PIN;
     mac->dev->params.dio3_pin = DIO3_PIN;
 
-    if(sx127x_setup(mac->dev) < 0) {
+    sx127x_radio_settings_t *radio = &s_radio;
+    radio->channel = s_lr_cfg.lr_channel;
+    radio->lora.bandwidth = s_lr_cfg.lr_bandwidth;
+    radio->lora.datarate = s_lr_cfg.lr_sf;
+    radio->lora.coderate = s_lr_cfg.lr_cr;    
+
+    if(sx127x_setup(mac->dev, radio) < 0) {
         sx127x_log(SX127X_ERROR, "stm_slrm_create: slrm exiting...\n");
         return NULL;
     }

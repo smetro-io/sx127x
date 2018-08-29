@@ -235,7 +235,7 @@ int sx127x_init(sx127x_t *dev);
  *
  * @param[in] dev                      The sx127x device pointer
  */
-void sx127x_init_radio_settings(sx127x_t *dev);
+void sx127x_init_radio_settings(sx127x_t *dev, sx127x_radio_settings_t *radio);
 
 /**
  * Generates 32 bits random value based on the RSSI readings
