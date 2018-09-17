@@ -8,6 +8,7 @@
 #include <stddef.h>
 
 #include "sx127x.h"
+#include "sx127x_drv.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +30,7 @@ typedef enum {
 } slrm_error_type;
 
 typedef void (*slrm_node_callback)(uint8_t status, uint8_t *data, size_t len);
-typedef bool (*slrm_gateway_callback)(uint8_t *data, size_t *len);
+typedef bool (*slrm_gateway_callback)(uint8_t *data, size_t *len, sx127x_lora_packet_info_t *info);
 
 typedef struct {
 	slrm_mode mode;

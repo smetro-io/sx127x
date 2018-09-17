@@ -39,6 +39,7 @@ extern "C" {
 #define SX127X_PAYLOAD_LENGTH            (0U)                   /**< Set payload length, unused with implicit header */
 
 #define SX127X_TX_TIMEOUT_DEFAULT        (1000U * 4UL)         /**< TX timeout, 4s */
+#define SX127X_RX_TIMEOUT_DEFAULT        (1000U * 2UL)         /**< RX timeout, 2s */
 #define SX127X_RX_SINGLE                 (false)                /**< Single byte receive mode => continuous by default */
 #define SX127X_RX_BUFFER_SIZE            (256)                  /**< RX buffer size */
 

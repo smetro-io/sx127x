@@ -113,8 +113,8 @@ static void slrm_node_recv(void) {
     len = sx127x_recv(mac->dev, NULL, 0, 0);
     memset(message, 0, 32);
     sx127x_recv(mac->dev, message, len, &packet_info);
-    sx127x_log(SX127X_DEBUG, "{Payload: (%d bytes), RSSI: %i, SNR: %i, TOA: %i}\n",
-        (int)len, packet_info.rssi, (int)packet_info.snr,
+    sx127x_log(SX127X_DEBUG, "{Payload: (%d bytes), RSSI: %d, SNR: %i, TOA: %i}\n",
+        (int)len, packet_info.rssi - 256, (int)packet_info.snr,
         (int)packet_info.time_on_air);
 
     if (slrm_check_frame(message, len)) {
@@ -143,12 +143,12 @@ static void slrm_gateway_recv(void) {
 
     memset(message, 0, 32);
     sx127x_recv(mac->dev, message, len, &packet_info);
-    sx127x_log(SX127X_DEBUG, "{Payload: (%d bytes), RSSI: %i, SNR: %i, TOA: %i}\n",
-        (int)len, packet_info.rssi, (int)packet_info.snr,
+    sx127x_log(SX127X_DEBUG, "{Payload: (%d bytes), RSSI: %d, SNR: %d, TOA: %d}\n",
+        (int)len, packet_info.rssi - 256, (int)packet_info.snr,
         (int)packet_info.time_on_air);
 
     if(mac->gateway_cb != NULL) {
-	    if(mac->gateway_cb(message, &len)) {
+	    if(mac->gateway_cb(message, &len, &packet_info)) {
 	    	sx127x_timer_msleep(20);
 	    	//sx127x_send(mac->dev, message, len);
 		} else {
@@ -168,7 +168,7 @@ void slrm_event_callback(void *param, int event) {
 	        break;
 	    case SX127X_TX_DONE:
 	        sx127x_log(SX127X_DEBUG, "Transmission completed\n");
-	        slrm_rx_single(dev, (1000U * 4UL));
+	        slrm_rx_single(dev, SX127X_RX_TIMEOUT_DEFAULT);
 	        break;
 	    case SX127X_CAD_DONE:
 	        break;

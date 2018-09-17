@@ -80,7 +80,7 @@ void sx127x_init_radio_settings(sx127x_t *dev, sx127x_radio_settings_t *radio)
     sx127x_set_payload_length(dev, SX127X_PAYLOAD_LENGTH);
     sx127x_set_hop_period(dev, SX127X_FREQUENCY_HOPPING_PERIOD);
 
-    sx127x_set_tx_power(dev, 20);
+    sx127x_set_tx_power(dev, radio->lora.power);
 }
 
 uint32_t sx127x_random(sx127x_t *dev)

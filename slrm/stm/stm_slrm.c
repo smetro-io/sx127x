@@ -36,10 +36,11 @@ slrm_t *stm_slrm_create(uint8_t* id,
 
     sx127x_radio_settings_t *radio = &s_radio;
 
-    radio->channel = config.lr_channel;
-    radio->lora.bandwidth = config.lr_bandwidth;
-    radio->lora.datarate = config.lr_sf;
-    radio->lora.coderate = config.lr_cr;
+    radio->channel = config.radio.lr_channel;
+    radio->lora.bandwidth = config.radio.lr_bandwidth;
+    radio->lora.datarate = config.radio.lr_sf;
+    radio->lora.coderate = config.radio.lr_cr;
+    radio->lora.power = config.radio.lr_gain;
 
     if(sx127x_setup(mac->dev, radio) < 0) {
         sx127x_log(SX127X_ERROR, "stm_slrm_create: slrm exiting...\n");
