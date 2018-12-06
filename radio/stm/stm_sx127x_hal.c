@@ -81,10 +81,10 @@ void sx127x_spi_read(void *spi, uint8_t addr, uint8_t *buffer, uint8_t size) {
 bool sx127x_gpio_init(int pin, sx127x_gpio_mode_t mode, sx127x_gpio_pull_t pull) {
     switch (mode) {
     case GPIO_IN:
-        gpio_init(pin, INPUT, pull);
+        gpio_init(pin, INPUT, pull, false);
         break;
     case GPIO_OUT:
-        gpio_init(pin, OUTPUT, pull);
+        gpio_init(pin, OUTPUT, pull, false);
         break;
     }
     return true;
@@ -95,13 +95,13 @@ bool sx127x_gpio_init_int(int pin, sx127x_gpio_mode_t mode, sx127x_gpio_pull_t p
 
     switch (int_mode) {
     case GPIO_RISING:
-        ext_interrupt_init(pin, INT_RISING, pull, cb, arg);
+        ext_interrupt_init(pin, INT_RISING, pull, false, cb, arg);
         break;
     case GPIO_FALLING:
-        ext_interrupt_init(pin, INT_FALLING, pull, cb, arg);
+        ext_interrupt_init(pin, INT_FALLING, pull, false, cb, arg);
         break;
     case GPIO_RISING_FALLING:
-        ext_interrupt_init(pin, INT_RISING_FALLING, pull, cb, arg);
+        ext_interrupt_init(pin, INT_RISING_FALLING, false, pull, cb, arg);
         break;        
     }
     return true;
